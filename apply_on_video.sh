@@ -33,8 +33,6 @@ while [[ -d ${TMP_DIR} ]]; do
     COUNT=$((COUNT+1))
 done
 
-ANONYMIZER_CMD="singularity run --nv anonymizer.sif --input \"${TMP_DIR}\" --image-output \"${TMP_DIR}\" --weights ./weights --no-write-detections --obfuscation-kernel 21,1,9"
-
 # Read parameters of original video.
 FRAMERATE=$(ffprobe -loglevel error -select_streams v:0 -show_entries stream=r_frame_rate -of default=nk=1:nw=1 ${INPUT_FILE})
 # Useful ideas from: https://stackoverflow.com/questions/34442156/ffmpeg-avconv-transcode-using-same-codec-and-params-as-input/34457444#34457444
@@ -50,8 +48,8 @@ mkdir ${TMP_DIR}
 ffmpeg -i "${INPUT_FILE}" -f image2 "${TMP_DIR}/%05d.png"
 
 # Run anonymizer on images.
-echo $ANONYMIZER_CMD
-eval $ANONYMIZER_CMD
+singularity run --nv --bind "${TMP_DIR}":/tmp_dir anonymizer.sif --input /tmp_dir --image-output /tmp_dir --weights ./weights --no-write-detections --obfuscation-kernel 21,1,9
+
 
 # Image2Video using original audio
 ffmpeg -r ${FRAMERATE} -i "${TMP_DIR}/%05d.png" -i "${INPUT_FILE}" -c:a copy -c:v libx264 -preset slow -pix_fmt yuv420p -map 0:v:0 -map 1:a:0 -y "${OUTPUT_FILE}"
