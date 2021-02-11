@@ -1,3 +1,25 @@
+# understand.ai Anonymizer Video Fork
+
+This fork just adds a bash script (`apply_on_video.sh`) to the original
+understand.ai Anonymizer that enables to apply the anonymizer script on videos
+(not just images).
+It does this by first extracting the images (using ffmpeg), then applying the
+anonymizer and then merging and encoding the images again with the original
+audio to a new video (using ffmpeg). Usage:
+
+```
+bash apply_on_video.sh INPUTFILE [OUTPUTFILE]
+```
+
+Note that the script will try to use a singularity image (if it finds it) to
+run the anonymizer with an old CUDA version (9.0, due to Tensorflow 1.11) as
+specified in the requirements on `master`. This is only necessary if you cannot
+run the script `anonymizer/bin/anonymize.py` on your system because you are
+missing some dependencies. To build the singularity image, run:
+```
+sudo singularity build anonymizer.sif Singularity
+```
+
 # understand.ai Anonymizer
 
 To improve privacy and make it easier for companies to comply with GDPR, we at [understand.ai](https://understand.ai/) 
